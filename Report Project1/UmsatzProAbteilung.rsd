@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSet Name="DataSet1">
+    <Query>
+      <DataSourceReference>Foodmart</DataSourceReference>
+      <CommandText>SELECT
+    CASE WHEN GROUPING(p.DEPARTMENT) = 1 THEN 'Gesamt' ELSE p.DEPARTMENT END AS Abteilung,
+    CASE WHEN GROUPING(t.TMONTHNUMBER) = 1 THEN 'Gesamt'
+         ELSE CAST(t.TYEAR AS VARCHAR(4)) + '-' + RIGHT('0' + CAST(t.TMONTHNUMBER AS VARCHAR(2)), 2)
+    END AS Monat,
+    SUM(s.STORESALES) AS Umsatz
+FROM SALESFACT s
+JOIN PRODUCT   p ON s.PRODUCTID = p.PRODUCTID
+JOIN TIMEBYDAY t ON s.TIMEID    = t.TIMEID
+GROUP BY CUBE (p.DEPARTMENT, (t.TYEAR, t.TMONTHNUMBER))
+ORDER BY
+    GROUPING(p.DEPARTMENT), p.DEPARTMENT,
+    GROUPING(t.TMONTHNUMBER), t.TYEAR, t.TMONTHNUMBER;</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Abteilung">
+        <DataField>Abteilung</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Monat">
+        <DataField>Monat</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Umsatz">
+        <DataField>Umsatz</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

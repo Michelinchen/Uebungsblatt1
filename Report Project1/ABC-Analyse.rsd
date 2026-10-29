@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SharedDataSet xmlns="http://schemas.microsoft.com/sqlserver/reporting/2010/01/shareddatasetdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSet Name="DataSet1">
+    <Query>
+      <DataSourceReference>Foodmart</DataSourceReference>
+      <CommandText>WITH kat AS (
+    SELECT p.CATEGORY, SUM(sf.STORESALES) AS Umsatz
+    FROM dbo.SALESFACT sf
+    JOIN dbo.PRODUCT p ON p.PRODUCTID = sf.PRODUCTID
+    GROUP BY p.CATEGORY
+),
+kum AS (
+    SELECT CATEGORY, Umsatz,
+           ROW_NUMBER() OVER (ORDER BY Umsatz DESC) AS Rang,
+           COUNT(*)     OVER ()                    AS AnzahlKat,
+           SUM(Umsatz)  OVER (ORDER BY Umsatz DESC
+                              ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS KumUmsatz,
+           SUM(Umsatz)  OVER ()                    AS GesamtUmsatz
+    FROM kat
+)
+SELECT Rang, CATEGORY, Umsatz,
+       CAST(100.0 * Umsatz    / GesamtUmsatz AS DECIMAL(5,2)) AS AnteilProzent,
+       CAST(100.0 * KumUmsatz / GesamtUmsatz AS DECIMAL(5,2)) AS KumAnteilUmsatz,
+       CAST(100.0 * Rang      / AnzahlKat    AS DECIMAL(5,2)) AS KumAnteilKategorien,
+       CASE
+           WHEN 100.0 * (KumUmsatz - Umsatz) / GesamtUmsatz &lt; 80 THEN 'A'
+           WHEN 100.0 * (KumUmsatz - Umsatz) / GesamtUmsatz &lt; 95 THEN 'B'
+           ELSE 'C'
+       END AS Klasse
+FROM kum
+ORDER BY Rang;</CommandText>
+    </Query>
+    <Fields>
+      <Field Name="Rang">
+        <DataField>Rang</DataField>
+        <rd:TypeName>System.Int64</rd:TypeName>
+      </Field>
+      <Field Name="CATEGORY">
+        <DataField>CATEGORY</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+      <Field Name="Umsatz">
+        <DataField>Umsatz</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="AnteilProzent">
+        <DataField>AnteilProzent</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="KumAnteilUmsatz">
+        <DataField>KumAnteilUmsatz</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="KumAnteilKategorien">
+        <DataField>KumAnteilKategorien</DataField>
+        <rd:TypeName>System.Decimal</rd:TypeName>
+      </Field>
+      <Field Name="Klasse">
+        <DataField>Klasse</DataField>
+        <rd:TypeName>System.String</rd:TypeName>
+      </Field>
+    </Fields>
+  </DataSet>
+</SharedDataSet>

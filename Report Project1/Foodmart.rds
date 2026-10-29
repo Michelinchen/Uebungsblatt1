@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RptDataSource xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Name="Foodmart">
+  <ConnectionProperties>
+    <Extension>OLEDB</Extension>
+    <ConnectString>Provider=MSOLEDBSQL.1;Data Source=sqlservervier.f4.htw-berlin.de;Initial Catalog=Foodmart</ConnectString>
+  </ConnectionProperties>
+  <DataSourceID>910a77e6-30ed-425f-868d-39cf5a35c308</DataSourceID>
+</RptDataSource>
